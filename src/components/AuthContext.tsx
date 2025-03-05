@@ -29,15 +29,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const login = async (username: string, password: string) => {
         try {
             const userData = await loginUser(username, password);
+            console.log("🔑 Received Token:", userData.token); // Debugging
+
+            console.log("Received userData:", userData); // Debugging
+
+            if (!userData.apiKey) throw new Error("API Key missing in response!");
+
             localStorage.setItem("user", JSON.stringify(userData));
-            localStorage.setItem("apiKey", userData.apiKey);
+            localStorage.setItem("apiKey", userData.token.startsWith("Bearer ") ? userData.token : `Bearer ${userData.token}`);
+            //Store API Key
+
             setUser(userData);
             setIsAuthenticated(true);
-            router.push("/dashboard"); // Redirect after login
+            router.push("/");// Redirect after login
         } catch (error) {
             console.error("Login failed:", error);
         }
     };
+
+    
 
     const logout = () => {
         localStorage.removeItem("user");

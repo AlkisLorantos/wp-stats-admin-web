@@ -1,57 +1,55 @@
-// import { Method, Route } from "@/types/definitions";
-
-// const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
-
-// export async function fetchApi(method: Method, route: Route, key: string, data?: Object) {
-//     const options: RequestInit = {
-//         method,
-//         headers: {
-//             "Content-Type": "application/json",
-//             "Authorization": key
-//         },
-//         cache: "no-store",
-//     };
-
-//     if (data && ["POST", "PUT", "DELETE"].includes(method)) {
-//         options.body = JSON.stringify(data);
-//     }
-
-//     const res = await fetch(`${API_URL}/${route}`, options);
-
-//     if (!res.ok) {
-//         throw new Error(`Error ${res.status}: ${await res.text()}`);
-//     }
-
-//     return res.json();
-// }
-
+"use client";
 import { Method, Route } from "@/types/definitions";
 
 export async function fetchApi(method: Method, route: Route, data?: Object) {
-    const key = localStorage.getItem("apiKey"); // Get stored API key
+    
+    if (typeof window === "undefined") {
+        throw new Error("fetchApi can only be used on the client");
+    }
+
+    const key = localStorage.getItem("apiKey");
+
+    console.log("Fetching:", method, `/players`);
+    console.log("Using API Key:", key);
 
     if (!key) {
         throw new Error("API key is missing. Please log in.");
     }
 
+    console.log(" Sending Request with API Key:", key);
+
     const options: RequestInit = {
         method,
         headers: {
             "Content-Type": "application/json",
-            "Authorization": key,
+            "Authorization": `Bearer ${key.replace("Bearer ", "")}`, // Ensure single Bearer
         },
         cache: "no-store",
     };
 
-    if (data && (method === "POST" || method === "PUT" || method === "DELETE")) {
+    if (data && ["POST", "PUT", "DELETE"].includes(method)) {
         options.body = JSON.stringify(data);
     }
 
-    const res = await fetch(`http://localhost:8000/${route}`, options);
+    console.log("Fetching:", `http://localhost:8000/${route}`, options);
 
-    if (!res.ok) {
-        throw new Error(`Error ${res.status}: ${await res.text()}`);
+    try {
+        const res = await fetch(`http://localhost:8000/${route}`, options);
+
+        if (!res.ok) {
+            const errorText = await res.text();
+            console.error("Fetch API Error:", errorText);
+            throw new Error(`Error ${res.status}: ${errorText}`);
+        }
+
+        const responseData = await res.json();
+        console.log("API Response:", responseData);
+
+        // Ensure response is wrapped in { data: ... }
+        return { data: Array.isArray(responseData) ? responseData : responseData.data || responseData };
+        
+    } catch (error) {
+        console.error("Fetch API error:", error);
+        throw error;
     }
-
-    return res.json();
 }
