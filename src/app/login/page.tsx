@@ -1,49 +1,61 @@
 "use client";
 
-import { useAuth } from "@/components/AuthContext";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { loginUser } from "@/lib/api/auth"; // adjust path to your API file
+import { useAuth } from "@/components/AuthContext";
 
 export default function LoginPage() {
-    const { login, isAuthenticated } = useAuth();
-    const router = useRouter();
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
+  const router = useRouter();
+  const { login } = useAuth();
 
-    useEffect(() => {
-        if (isAuthenticated) {
-            router.push("/");
-        }
-    }, [isAuthenticated, router]);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        await login(username, password);
-    };
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
 
-    return (
-        <main className="h-screen flex items-center justify-center">
-            <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md">
-                <h2 className="text-xl font-bold mb-4">Login</h2>
-                <input
-                    type="text"
-                    placeholder="Username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    className="border p-2 w-full mb-3"
-                />
-                <input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="border p-2 w-full mb-3"
-                />
-                <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
-                    Login
-                </button>
-            </form>
-        </main>
-    );
+    try {
+      const res = await loginUser(username, password);
+      login(res.token); // save token in context/localStorage
+      router.push("/dashboard"); // or wherever
+    } catch (err: any) {
+      setError(err.message || "Login failed");
+    }
+  };
+
+  return (
+    <main className="max-w-md mx-auto mt-20 p-6 border rounded-lg shadow">
+      <h1 className="text-2xl font-bold mb-6">Login to WP Stats</h1>
+
+      <form onSubmit={handleLogin} className="space-y-4">
+        <input
+          type="text"
+          placeholder="Username"
+          className="w-full border px-3 py-2 rounded"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
+
+        <input
+          type="password"
+          placeholder="Password"
+          className="w-full border px-3 py-2 rounded"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+
+        <button
+          type="submit"
+          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+        >
+          Log In
+        </button>
+
+        {error && <p className="text-red-600 text-sm">{error}</p>}
+      </form>
+    </main>
+  );
 }
-

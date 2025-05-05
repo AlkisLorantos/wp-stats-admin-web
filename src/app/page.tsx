@@ -1,78 +1,40 @@
+"use client";
 
-import Image from "next/image";
-import Link from "next/link";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
-export default function Home() {
-	return (
-		<main className="flex min-h-screen flex-col items-center justify-between p-24">
-			<div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
-				<Link
-					href="/players"
-					className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-					rel="noopener noreferrer"
-				>
-					<h2 className="mb-3 text-2xl font-semibold">
-						Players{" "}
-						<span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-							-&gt;
-						</span>
-					</h2>
-					<p className="m-0 max-w-[30ch] text-sm opacity-50">
-						{/* Find in-depth information about Next.js features and API. */}
-					</p>
-				</Link>
+export default function HomePage() {
+  const router = useRouter();
 
-				<a
-					href="/teams"
-					className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					<h2 className="mb-3 text-2xl font-semibold">
-						Teams{" "}
-						<span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-							-&gt;
-						</span>
-					</h2>
-					<p className="m-0 max-w-[30ch] text-sm opacity-50">
-						{/* Learn about Next.js in an interactive course with&nbsp;quizzes! */}
-					</p>
-				</a>
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      router.push("/dashboard");
+    }
+  }, []);
 
-				<a
-					href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-					className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					<h2 className="mb-3 text-2xl font-semibold">
-						Leagues{" "}
-						<span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-							-&gt;
-						</span>
-					</h2>
-					<p className="m-0 max-w-[30ch] text-sm opacity-50">
-						{/* Explore starter templates for Next.js. */}
-					</p>
-				</a>
-
-				<a
-					href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-					className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					<h2 className="mb-3 text-2xl font-semibold">
-						Games{" "}
-						<span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-							-&gt;
-						</span>
-					</h2>
-					<p className="m-0 max-w-[30ch] text-balance text-sm opacity-50">
-						{/* Instantly deploy your Next.js site to a shareable URL with Vercel. */}
-					</p>
-				</a>
-			</div>
-		</main>
-	);
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+      <div className="max-w-xl text-center space-y-6">
+        <h1 className="text-4xl font-bold text-gray-800">Welcome to Water Polo Stats</h1>
+        <p className="text-gray-600 text-lg">
+          Track detailed water polo game statistics for your team. Create your team, add players, and start recording stats live.
+        </p>
+        <div className="flex justify-center gap-4">
+          <button
+            onClick={() => router.push("/login")}
+            className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+          >
+            Login
+          </button>
+          <button
+            onClick={() => router.push("/signup")}
+            className="bg-gray-300 text-gray-800 px-6 py-2 rounded hover:bg-gray-400"
+          >
+            Sign Up
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }
