@@ -12,9 +12,12 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [teamName, setTeamName] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
 
     try {
       setLoading(true);
@@ -26,16 +29,15 @@ export default function SignupPage() {
       });
 
       const data = await res.json();
-
       if (!res.ok) throw new Error(data.message || "Signup failed");
 
       localStorage.setItem("user", JSON.stringify(data.user));
       localStorage.setItem("team", JSON.stringify(data.team));
-      login(data.token); // sets token and triggers context update
+      login(data.token); 
 
       router.push("/dashboard");
     } catch (err: any) {
-      alert(err.message || "Something went wrong");
+      setError(err.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
@@ -69,6 +71,8 @@ export default function SignupPage() {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
+        {error && <p className="text-red-600">{error}</p>}
+        
         <button
           type="submit"
           disabled={loading}

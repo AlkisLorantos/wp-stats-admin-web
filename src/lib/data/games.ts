@@ -45,6 +45,13 @@ export async function deleteGame(id: number) {
   return res.data;
 }
 
+export const startGame = async (id: number) => {
+  return await fetchApi("PATCH", `games/${id}/start`);
+};
+
+export const endGame = async (id: number) => {
+  return await fetchApi("PATCH", `games/${id}/end`);
+};
 
 // GET /stats/roster/:gameId
 export async function getGameRoster(gameId: number) {
